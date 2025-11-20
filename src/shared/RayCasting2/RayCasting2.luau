@@ -91,11 +91,13 @@ function RayCasting2:HeartBeat<T>(CallBack: (Result: { result_ }, RaycastInfo: {
 		local self = self :: _ray_info_
 		local Result = __NEW_RAY_(self) :: result_
 		
-		if Result then
-			CallBack(Result, __GET_RAY_INFO_(self))
-		else
-			return nil
-		end
+		RunService.Heartbeat:Connect(function(deltatime: number)
+			if Result then
+				CallBack(Result, __GET_RAY_INFO_(self))
+			else
+				return nil
+			end
+		end)
 	end
 end
 
