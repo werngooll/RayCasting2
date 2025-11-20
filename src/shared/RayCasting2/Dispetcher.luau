@@ -1,30 +1,33 @@
 local Dispetcher = {}
 
-function Dispetcher.onWarn(...:any)
-	warn("[RayCasting2-WARN]:", ...)
+function Dispetcher.onWarn(...:any) -- TODO: WARN IN CONSOLE
+	if type(...) == "string" then
+		warn("[RayCasting2-WARN]:", ...)
+	else
+		Dispetcher.onError("c_error", `not registered type`)
+	end
 end
 
-function Dispetcher.onError(_type: string, ...:any)
+function Dispetcher.onError(_type: string, ...:any) -- TODO: ERROR IN CONSOLE
 	if type(_type) == "string" then
-		if _type == "nil" then
+		if _type == "nil" then -- NIL ERROR
 			return error("[RayCasting2-ERROR]: "..                                                       
 				`{nil}`,
-				5
+				25
 			)
-		elseif _type == "error" then
+		elseif _type == "error" then -- CLASSIC ERROR
 			return error("[RayCasting2-ERROR]: "..                                                     
-				`[type] = {type(...)} `..
-				`[source] = { if type(...) == "table" then table.unpack(...) else ... }`,
-				5
+				`{ ... }`,
+				25
 			)
-		elseif _type == "c_error" then
+		elseif _type == "c_error" then -- CRITICAL ERROR TODO: CRITICAL ERROR IN CONSOLE
 			return error("[RayCasting2-CRITICAL-ERROR]: "..                                                     
 				`{...}`,
 				5
 			)
 		end
-	else
-		return error("[RayCasting2-CRITICAL-ERROR]: "..                                                      
+	else -- NOT REGISTERED TYPE TODO: CRITICAL ERROR IN CONSOLE
+		return error("[RayCasting2-CRITICAL-ERROR]: "..                                            
 			`[type] = {type(...)} `..
 			`[source] = {...}`,
 			5
