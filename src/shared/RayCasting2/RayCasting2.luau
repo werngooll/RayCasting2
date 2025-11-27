@@ -1,4 +1,9 @@
 --!native
+
+--[[
+    @Version 1.0.5
+]]
+
 local RayCasting2 = {}
 RayCasting2.__index = RayCasting2
 
@@ -9,7 +14,7 @@ local function __GET_RAY_INFO_(INFO: _ray_info_) -- TODO: GET INFO
 	return INFO.Origin, INFO.Direction
 end
 
-type result_ = {  } -- result type
+type result_ = { [string]: any } -- result type
 
 type _Params_ = { -- params type
 	Filter_Type: RaycastParams,
@@ -63,7 +68,7 @@ function RayCasting2.new(...: { any })
 			Dispetcher.onError("error", `not registered type. [{type(TABLE__.Origin) or type(TABLE__.Direction)}]`)
 		end
 		
-		return setmetatable({ 
+		return setmetatable({  -- [ meta__ ] [ TODO: `props` ]
 			Origin = TABLE__.Origin,
 			Direction = TABLE__.Direction,
 			
@@ -80,9 +85,9 @@ function RayCasting2.new(...: { any })
 	end
 end
 
-function RayCasting2:HeartBeat<T>(CallBack: (Result: { result_ }, RaycastInfo: { _ray_info_ }) -> (), info)
+function RayCasting2:HeartBeat(CallBack: (Result: { result_ }, RaycastInfo: { _ray_info_ }) -> (), info)
 	if self.__index.__isLive == false then
-		return false
+		return false -- TODO: `is not live`
 	end 
 	
 	if CallBack == nil then
@@ -121,7 +126,7 @@ function RayCasting2:find(result: RaycastResult, Name: string?) : BasePart?
 	end
 end
 
-function RayCasting2:useInfo<T>(...: { _ray_info_ })
+function RayCasting2:useInfo(...: { _ray_info_ })
 	local TABLE_ = ... :: _ray_info_
 	
 	if ... == nil or not TABLE_.Origin and TABLE_.Direction then
@@ -131,7 +136,12 @@ function RayCasting2:useInfo<T>(...: { _ray_info_ })
 	end
 end
 
-function RayCasting2:useUpdate<T>(...: { _ray_info_ })
+--[=[
+	@class [useUpdate]
+	TODO: use update ray.
+]=]
+
+function RayCasting2:useUpdate(...: { _ray_info_ })
 	if ... == nil then
 		Dispetcher.onError("nil")
 	else
@@ -144,7 +154,15 @@ function RayCasting2:useUpdate<T>(...: { _ray_info_ })
 	end
 end
 
-function RayCasting2:Unsubscribe<T>()
+--[=[
+	@class [Disconnect]
+	TODO: Disconnect the ray.
+	
+	@Storage: `Disconnect`
+	                        {  __isLive = false  }
+]=]
+
+function RayCasting2:Disconnect()
 	if not self.__index then
 		Dispetcher.onError("nil")
 	end
@@ -152,7 +170,12 @@ function RayCasting2:Unsubscribe<T>()
 	self.__index.__isLive = false
 end
 
-function RayCasting2:Subscribe<T>(CallBack: (Result: { result_ }, RaycastInfo: { _ray_info_ }) -> ())	
+--[=[
+	@class [Subscribe]
+	TODO: Subscribe to the ray.
+]=]
+
+function RayCasting2:Connect(CallBack: (Result: { result_ }) -> ())	
 	if self.__index.__isLive == false then
 		return false
 	end 
