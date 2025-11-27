@@ -12,7 +12,7 @@ function Dispetcher.onError(_type: string, ...:any) -- TODO: ERROR IN CONSOLE
 	if type(_type) == "string" then
 		if _type == "nil" then -- NIL ERROR
 			return error("[RayCasting2-ERROR]: "..                                                       
-				`{nil}`,
+				`{ string.format("%s", ...) }`,
 				25
 			)
 		elseif _type == "error" then -- CLASSIC ERROR
