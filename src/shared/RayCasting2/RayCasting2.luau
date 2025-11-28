@@ -1,7 +1,7 @@
 --!native
 
 --[[
-    @Version 1.0.5
+    @Version 1.0.6
 ]]
 
 local RayCasting2 = {}
@@ -34,6 +34,19 @@ type _ray_info_ = { -- ray info type
 	}
 }
 
+local function FindFirstChildOfClass(Type: string, ray: RaycastResult)
+	if Type == nil then
+		Dispetcher.onError(`nil`)
+	else
+		local _Type = Type
+		local object = if ray.Instance.ClassName == Type then ray.Instance else nil
+		
+		if object then
+			return object
+		end
+	end
+end
+
 local function __NEW_RAY_(INFO: _ray_info_)
 	local origin, direction = __GET_RAY_INFO_(INFO)
 	
@@ -53,6 +66,100 @@ local function __NEW_RAY_(INFO: _ray_info_)
 	
 	return rayResult
 end
+
+--
+
+function RayCasting2:HeartBeat(CallBack: (Result: { result_ }) -> (), info)
+	if self.__index.__isLive == false then
+		return Dispetcher.onWarn(`Ray is not Live.`) -- TODO: `is not live`
+	end 
+
+	if CallBack == nil then
+		Dispetcher.onError("error", `not registered argument "{`CallBack`}".`)
+	else
+		local self = self :: _ray_info_
+		local Result = __NEW_RAY_(self) :: result_
+
+		RunService.Heartbeat:Connect(function(deltatime: number)
+			if Result then
+				CallBack(Result, __GET_RAY_INFO_(self))
+			else
+				return nil
+			end
+		end)
+	end
+end
+
+--[=[
+	@class [Disconnect]
+	TODO: Disconnect the ray.
+	
+	@Storage: `Disconnect`
+	                        {  __isLive = false  }
+]=]
+
+function RayCasting2:Disconnect()
+	if not self.__index then
+		Dispetcher.onError("nil")
+	end
+
+	self.__index.__isLive = false
+end
+
+--[=[
+	@class [Subscribe]
+	TODO: Subscribe to the ray.
+]=]
+
+function RayCasting2:FindFirstChildOfClass(Type: string, result: RaycastResult)
+	if result == nil or not result then
+		return Dispetcher.onWarn(`nil`)
+	else
+		return FindFirstChildOfClass(Type, result)
+	end
+end
+
+function RayCasting2:Wait()
+	if self.__index.__isLive == false then
+		return Dispetcher.onWarn(`Ray is not Live.`)
+	end 
+
+	if not self.Origin and self.Direction or self.Origin == nil and self.Direction == nil then
+		Dispetcher.onError("error", `not registered argument.`)
+	else
+		local Result = __NEW_RAY_(self) :: result_
+
+		if Result then
+			return Result
+		else
+			return nil
+		end
+	end	
+end
+
+function RayCasting2:Connect(CallBack: (Result: { result_ }) -> ())
+	if self.__index.__isLive == false then
+		return Dispetcher.onWarn(`Ray is not Live.`)
+	end 
+
+	if not self.Origin and self.Direction or self.Origin == nil and self.Direction == nil then
+		Dispetcher.onError("error", `not registered argument.`)
+	else
+		if CallBack == nil or not CallBack then
+			Dispetcher.onError("error", `not registered argument.`)
+		else
+			local Result = __NEW_RAY_(self) :: result_
+
+			if Result then
+				CallBack(Result)
+			else
+				CallBack({})
+			end
+		end
+	end
+end
+
+--
 
 function RayCasting2.new(...: { any })
 	if ... == nil then
@@ -82,27 +189,6 @@ function RayCasting2.new(...: { any })
 		}, RayCasting2)
 	else
 		Dispetcher.onError("error", ...)
-	end
-end
-
-function RayCasting2:HeartBeat(CallBack: (Result: { result_ }, RaycastInfo: { _ray_info_ }) -> (), info)
-	if self.__index.__isLive == false then
-		return false -- TODO: `is not live`
-	end 
-	
-	if CallBack == nil then
-		Dispetcher.onError("error", `not registered argument "{`CallBack`}".`)
-	else
-		local self = self :: _ray_info_
-		local Result = __NEW_RAY_(self) :: result_
-		
-		RunService.Heartbeat:Connect(function(deltatime: number)
-			if Result then
-				CallBack(Result, __GET_RAY_INFO_(self))
-			else
-				return nil
-			end
-		end)
 	end
 end
 
@@ -139,6 +225,10 @@ end
 --[=[
 	@class [useUpdate]
 	TODO: use update ray.
+	
+	
+	
+	
 ]=]
 
 function RayCasting2:useUpdate(...: { _ray_info_ })
@@ -150,50 +240,8 @@ function RayCasting2:useUpdate(...: { _ray_info_ })
 		
 		self.Direction = TABLE__.Direction
 		self.Origin = TABLE__.Origin
+		
 		self.__index.__isLive = true
-	end
-end
-
---[=[
-	@class [Disconnect]
-	TODO: Disconnect the ray.
-	
-	@Storage: `Disconnect`
-	                        {  __isLive = false  }
-]=]
-
-function RayCasting2:Disconnect()
-	if not self.__index then
-		Dispetcher.onError("nil")
-	end
-	
-	self.__index.__isLive = false
-end
-
---[=[
-	@class [Subscribe]
-	TODO: Subscribe to the ray.
-]=]
-
-function RayCasting2:Connect(CallBack: (Result: { result_ }) -> ())	
-	if self.__index.__isLive == false then
-		return false
-	end 
-	
-	if not self.Origin and self.Direction or self.Origin == nil and self.Direction == nil then
-		Dispetcher.onError("error", `not registered argument.`)
-	else
-		if CallBack == nil or not CallBack then
-			Dispetcher.onError("error", `not registered argument.`)
-		else
-			local Result = __NEW_RAY_(self) :: result_
-			
-			if Result then
-				CallBack(Result, __GET_RAY_INFO_(self))
-			else
-				CallBack({}, nil)
-			end
-		end
 	end
 end
 
