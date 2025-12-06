@@ -70,10 +70,6 @@ print(result.Instance.Name)
 
 __Disconnect is turning off the ray.__
 
->[!WARNING]
->***If you use this command, the ray will be turned off.***
->
-
 ```
 new:Disconnect()
 ```
