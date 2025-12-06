@@ -7,24 +7,24 @@
 local RayCasting2 = {}
 RayCasting2.__index = RayCasting2
 
+local Packages = game.ReplicatedStorage:WaitForChild("Packages")
+
 local RunService = game:GetService("RunService")
+local charm = require(Packages.charm)
+local React = require(Packages.Roact.React)
 local Dispetcher = require(script.Parent.Dispetcher) -- TODO: CONSOLE LOGS
 
-local function __GET_RAY_INFO_(INFO: _ray_info_) -- TODO: GET INFO
-	return INFO.Origin, INFO.Direction
-end
-
-type result_ = { [string]: any } -- result type
-
-type _Params_ = { -- params type
+export type _Params_ = { -- params type
 	Filter_Type: RaycastParams,
 	Filter_Descendants_Instances: {}
 }
 
-type _ray_info_ = { -- ray info type
+export type result_ = { [string]: any }
+
+export type _ray_info_ = { -- ray info type
 	Origin: Vector3, 
 	Direction: Vector3,
-	
+
 	__index: {
 		__Params: {
 			Filter_Type: RaycastParams,
@@ -33,6 +33,23 @@ type _ray_info_ = { -- ray info type
 		__isLive: boolean
 	}
 }
+
+local _ray_info_ = { -- ray info type
+	Origin = nil,
+	Direction = nil,
+
+	__index = {
+		__Params =  {
+			Filter_Type = nil,
+			FilterDescendantsInstances = nil
+		},
+		__isLive = nil
+	}
+}
+
+local function __GET_RAY_INFO_(INFO: _ray_info_) -- TODO: GET INFO
+	return INFO.Origin, INFO.Direction
+end
 
 local function FindFirstChildOfClass(Type: string, ray: RaycastResult)
 	if Type == nil then
@@ -67,11 +84,26 @@ local function __NEW_RAY_(INFO: _ray_info_)
 	return rayResult
 end
 
---
-
+--[=[
+    Connects the raycast.
+    
+    
+ 
+    @params: CallBack
+    @return: RaycastResult
+    
+    ```lua
+    local Raycasting2 = require(path.to.RayCasting2)
+    local array = Raycasting2:useInfo({ any })
+    local Raycast = Raycasting2.new(array)
+    
+    Raycast:HeartBeat(function(Result)
+    end)
+    ```
+]=]
 function RayCasting2:HeartBeat(CallBack: (Result: { result_ }) -> (), info)
 	if self.__index.__isLive == false then
-		return Dispetcher.onWarn(`Ray is not Live.`) -- TODO: `is not live`
+		return nil
 	end 
 
 	if CallBack == nil then
@@ -91,26 +123,48 @@ function RayCasting2:HeartBeat(CallBack: (Result: { result_ }) -> (), info)
 end
 
 --[=[
-	@class [Disconnect]
-	TODO: Disconnect the ray.
-	
-	@Storage: `Disconnect`
-	                        {  __isLive = false  }
+    Disconnects the raycast.
+    
+    
+    
+    @params: nil
+    @return: nil
+    
+    ```lua
+    local Raycasting2 = require(path.to.RayCasting2)
+    local array = Raycasting2:useInfo({ any })
+    local Raycast = Raycasting2.new(array)
+    
+    Raycast:Disconnect()
+    ```
 ]=]
-
 function RayCasting2:Disconnect()
-	if not self.__index then
-		Dispetcher.onError("nil")
+	if self == nil then
+		return Dispetcher.onError(`nil`,
+			`nil`
+		)
 	end
-
+	
+	Dispetcher.onWarn(`Ray Disconnected. `)
 	self.__index.__isLive = false
 end
 
 --[=[
-	@class [Subscribe]
-	TODO: Subscribe to the ray.
+    Finds a child of the specified class.
+    
+    
+    
+    @params: Type: string, result: RaycastResult
+    @return: Instance
+    
+    ```lua
+    local Raycasting2 = require(path.to.RayCasting2)
+    local array = Raycasting2:useInfo({ any })
+    local Raycast = Raycasting2.new(array)
+    
+    local Part = Raycast:FindFirstChildOfClass("Part", result)
+    ```
 ]=]
-
 function RayCasting2:FindFirstChildOfClass(Type: string, result: RaycastResult)
 	if result == nil or not result then
 		return Dispetcher.onWarn(`nil`)
@@ -119,9 +173,24 @@ function RayCasting2:FindFirstChildOfClass(Type: string, result: RaycastResult)
 	end
 end
 
+--[=[
+    Waits for the raycast to hit something.
+    
+    
+    
+    @return: RaycastResult
+    
+    ```lua
+    local Raycasting2 = require(path.to.RayCasting2)
+    local array = Raycasting2:useInfo({ any })
+    local Raycast = Raycasting2.new(array)
+    
+    local Result = Raycast:Wait()
+    ```
+]=]
 function RayCasting2:Wait()
 	if self.__index.__isLive == false then
-		return Dispetcher.onWarn(`Ray is not Live.`)
+		return nil
 	end 
 
 	if not self.Origin and self.Direction or self.Origin == nil and self.Direction == nil then
@@ -137,9 +206,27 @@ function RayCasting2:Wait()
 	end	
 end
 
+--[=[
+    Connects the raycast to the callback.
+    
+    
+    
+    @params: CallBack
+    @return: RaycastResult
+    
+    ```lua
+    local Raycasting2 = require(path.to.RayCasting2)
+    local array = Raycasting2:useInfo({ any })
+    local Raycast = Raycasting2.new(array)
+    
+    Raycast:Connect(function(Result)
+        print(Result)
+    end)
+    ```
+]=]
 function RayCasting2:Connect(CallBack: (Result: { result_ }) -> ())
 	if self.__index.__isLive == false then
-		return Dispetcher.onWarn(`Ray is not Live.`)
+		return nil
 	end 
 
 	if not self.Origin and self.Direction or self.Origin == nil and self.Direction == nil then
@@ -159,39 +246,66 @@ function RayCasting2:Connect(CallBack: (Result: { result_ }) -> ())
 	end
 end
 
---
-
-function RayCasting2.new(...: { any })
-	if ... == nil then
+--[=[
+    Creates a new raycast.
+    
+    
+    
+    @Params: array
+    @return: Raycast
+    
+    ```lua
+    local Raycasting2 = require(path.to.RayCasting2)
+    local array = Raycasting2:useInfo({ any })
+    
+    local Raycast = Raycasting2.new(array)
+    ```
+]=]
+function RayCasting2.new(Array)
+	if Array == nil then
 		Dispetcher.onError("nil", nil)
 	end
-	
-	if type(...) :: _ray_info_ then
-		local TABLE__ = ... :: _ray_info_
-		
-		if not TABLE__.Origin and TABLE__.Direction then
+
+	if type(Array) :: _ray_info_ then
+		if not Array.Origin and Array.Direction then
 			Dispetcher.onError("error", `not registered argument.`)
-		elseif type(TABLE__.Origin) == not "Vector3" and type(TABLE__.Direction) == not "Vector3" then
-			Dispetcher.onError("error", `not registered type. [{type(TABLE__.Origin) or type(TABLE__.Direction)}]`)
+		elseif type(Array.Origin) == not "Vector3" and type(Array.Direction) == not "Vector3" then
+			Dispetcher.onError("error", `not registered type. [{type(Array.Origin) or type(Array.Direction)}]`)
 		end
-		
+
 		return setmetatable({  -- [ meta__ ] [ TODO: `props` ]
-			Origin = TABLE__.Origin,
-			Direction = TABLE__.Direction,
-			
+			Origin = Array.Origin,
+			Direction = Array.Direction,
+
 			__index = {
 				__Params = {
-					Filter_Type = TABLE__.FilterType,
-					FilterDescendantsInstances = TABLE__.FilterDescendantsInstances
+					Filter_Type = Array.FilterType,
+					FilterDescendantsInstances = Array.FilterDescendantsInstances
 				},
 				__isLive = true
 			}
 		}, RayCasting2)
 	else
-		Dispetcher.onError("error", ...)
+		Dispetcher.onError("error", Array)
 	end
 end
 
+--[=[
+    Finds the part with the name.
+    
+    
+    
+    @params: RaycastResult, string
+    @return: BasePart?
+    
+    ```lua
+    local Raycasting2 = require(path.to.RayCasting2)
+    local array = Raycasting2:useInfo({ any })
+    local Raycast = Raycasting2.new(array)
+    
+    Raycast:find(result, "BasePart")
+    ```
+]=]
 function RayCasting2:find(result: RaycastResult, Name: string?) : BasePart?
 	if result == nil then
 		Dispetcher.onError("nil")
@@ -212,39 +326,55 @@ function RayCasting2:find(result: RaycastResult, Name: string?) : BasePart?
 	end
 end
 
-function RayCasting2:useInfo(...: { _ray_info_ })
-	local TABLE_ = ... :: _ray_info_
-	
-	if ... == nil or not TABLE_.Origin and TABLE_.Direction then
+--[=[
+    Returns the result of the raycast.
+    
+    
+    
+    @class: hooks
+    @params: array
+    @return: array
+    
+    ```lua
+    local Raycasting2 = require(path.to.RayCasting2)
+    
+    local array = Raycasting2:useInfo({ any })
+    ```
+]=]
+function RayCasting2:useInfo(Array: { _ray_info_ })
+	if Array == nil or not Array.Origin and Array.Direction then
 		Dispetcher.onError("nil")
 	else
-		return ...
+		return Array
 	end
 end
 
 --[=[
-	@class [useUpdate]
-	TODO: use update ray.
-	
-	
-	
-	
+    Updates the raycast.
+    
+    
+    
+    @class: hooks
+    @params: array
+    @return: nil
+    
+    ```lua
+    local Raycasting2 = require(path.to.RayCasting2)
+    local array = Raycasting2:useInfo({ any })
+    local Raycast = Raycasting2.new(array)
+    
+    Raycast:useUpdate(array)
+    ```
 ]=]
-
-function RayCasting2:useUpdate(...: { _ray_info_ })
-	if ... == nil then
+function RayCasting2:useUpdate(Array: { _ray_info_ })
+	if Array == nil then
 		Dispetcher.onError("nil")
 	else
-		local self = self :: _ray_info_
-		local TABLE__ = ... :: _ray_info_
-		
-		self.Direction = TABLE__.Direction
-		self.Origin = TABLE__.Origin
+		self.Direction = Array.Direction
+		self.Origin = Array.Origin
 		
 		self.__index.__isLive = true
 	end
 end
-
-type RayCasting2 = typeof(RayCasting2)
-
+export type RayCasting2 = typeof(RayCasting2)
 return RayCasting2 :: RayCasting2
