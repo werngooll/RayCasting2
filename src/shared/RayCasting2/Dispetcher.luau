@@ -1,5 +1,8 @@
 local Dispetcher = {}
 
+--[=[
+    @warn in console
+]=]
 function Dispetcher.onWarn(...:any) -- TODO: WARN IN CONSOLE
 	if type(...) == "string" then
 		warn("[RayCasting2-WARN]:", ...)
@@ -8,13 +11,23 @@ function Dispetcher.onWarn(...:any) -- TODO: WARN IN CONSOLE
 	end
 end
 
+--[=[
+    @error in console
+]=]
 function Dispetcher.onError(_type: string, ...:any) -- TODO: ERROR IN CONSOLE
 	if type(_type) == "string" then
 		if _type == "nil" then -- NIL ERROR
-			return error("[RayCasting2-ERROR]: "..                                                       
-				`{ string.format("%s", ...) }`,
-				25
-			)
+			if ... == nil then
+				return error("[RayCasting2-ERROR]: "..                                                       
+					`context nil`,
+					25
+				)
+			else
+				return error("[RayCasting2-ERROR]: "..                                                       
+					`{ ... }`,
+					25
+				)
+			end
 		elseif _type == "error" then -- CLASSIC ERROR
 			return error("[RayCasting2-ERROR]: "..                                                     
 				`{ ... }`,
@@ -34,5 +47,7 @@ function Dispetcher.onError(_type: string, ...:any) -- TODO: ERROR IN CONSOLE
 		)
 	end 
 end
+
+export type Dispetcher = typeof(Dispetcher)
 
 return Dispetcher
