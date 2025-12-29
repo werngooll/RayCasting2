@@ -332,20 +332,30 @@ end
     
     
     @class: hooks
-    @params: array
+    @params: Direction
+    @params: Origin
+    @params: Filter_Type
+    @params: FilterDescendantsInstances
+    @params: __isLive
     @return: array
     
     ```lua
     local Raycasting2 = require(path.to.RayCasting2)
     
-    local array = Raycasting2:useInfo({ any })
+    local array = Raycasting2:useInfo( any )
     ```
 ]=]
-function RayCasting2:useInfo(Array: { _ray_info_ })
-	if Array == nil or not Array.Origin and Array.Direction then
+function RayCasting2:useInfo(Direction, Origin, Filter_Type, FilterDescendantsInstances, __isLive)
+	if not Origin and Direction then
 		Dispetcher.onError("nil")
 	else
-		return Array
+		return {
+			Direction = Direction,
+			Origin = Origin,
+			Filter_Type = Filter_Type,
+			FilterDescendantsInstances = FilterDescendantsInstances,
+			__isLive = __isLive
+		}
 	end
 end
 
