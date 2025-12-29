@@ -7,11 +7,7 @@
 local RayCasting2 = {}
 RayCasting2.__index = RayCasting2
 
-local Packages = game.ReplicatedStorage:WaitForChild("Packages")
-
 local RunService = game:GetService("RunService")
-local charm = require(Packages.charm)
-local React = require(Packages.Roact.React)
 local Dispetcher = require(script.Parent.Dispetcher) -- TODO: CONSOLE LOGS
 
 export type _Params_ = { -- params type
@@ -48,6 +44,7 @@ local _ray_info_ = { -- ray info type
 }
 
 local function __GET_RAY_INFO_(INFO: _ray_info_) -- TODO: GET INFO
+	print(INFO)
 	return INFO.Origin, INFO.Direction
 end
 
@@ -113,11 +110,7 @@ function RayCasting2:HeartBeat(CallBack: (Result: { result_ }) -> (), info)
 		local Result = __NEW_RAY_(self) :: result_
 
 		RunService.Heartbeat:Connect(function(deltatime: number)
-			if Result then
-				CallBack(Result, __GET_RAY_INFO_(self))
-			else
-				return nil
-			end
+			CallBack(Result, __GET_RAY_INFO_(self))
 		end)
 	end
 end
@@ -236,7 +229,7 @@ function RayCasting2:Connect(CallBack: (Result: { result_ }) -> ())
 			Dispetcher.onError("error", `not registered argument.`)
 		else
 			local Result = __NEW_RAY_(self) :: result_
-
+			
 			if Result then
 				CallBack(Result)
 			else
